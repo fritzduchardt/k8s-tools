@@ -5,7 +5,7 @@ config_file=$dir/context-config
 
 short=${1?Please provide context shortcut}
 long=${2?Please provide context long version}
-path=${2?Please provide path to kube config file}
+path=${3?Please provide path to kube config file}
 
 count=$(grep -c "$short" "$config_file" || true)
 

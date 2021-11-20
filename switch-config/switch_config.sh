@@ -1,8 +1,11 @@
 #!/usr/bin/env bash
 
+cluster=${1:?Please provide cluster}
 dir=$(dirname "$0")
 config_file=$dir/context-config
-cluster=${1:?Please provide cluster}
+
+
+
 declare -A configMap
 declare -A titleMap
 
