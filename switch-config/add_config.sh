@@ -7,7 +7,7 @@ short=${1?Please provide context shortcut}
 long=${2?Please provide context long version}
 path=${3?Please provide path to kube config file}
 
-count=$(grep -c "$short" "$config_file" || true)
+count=$(grep -c "$short#" "$config_file" || true)
 
 if [ "$count" -gt 0 ]; then
   echo "Config for \"${short}\" does already exist" >&2

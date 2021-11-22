@@ -2,6 +2,7 @@
 set -euo pipefail
 
 service=${1:?Please provide service}
+new_terminal=${2:-true}
 dir=$(dirname "$0")
 config_file=$dir/port-forward-config
 cluster=$(kubectl config current-context)
@@ -12,4 +13,8 @@ if [ -z "$config_line" ]; then
   exit 1
 fi
 
-gnome-terminal --title "$KUBE_CLUSTER - ${cluster^} - ${service^}" -- $(dirname "$0")/port_forward.sh "$service"
+if [ "$new_terminal" = true ]; then
+  gnome-terminal --title "$KUBE_CLUSTER - ${cluster^} - ${service^}" -- $(dirname "$0")/port_forward.sh "$service"
+else
+  $(dirname "$0")/port_forward.sh "$service"
+fi
