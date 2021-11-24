@@ -14,6 +14,6 @@ if [ "$count" -gt 0 ]; then
   exit 1
 fi
 
-echo -e "${short}#${long}#${path}" >> "$config_file"
+echo -e "${short}#${long}#${path}\n" >> "$config_file"
 
-echo "Context was added"
+echo "Context was added to $config_file"

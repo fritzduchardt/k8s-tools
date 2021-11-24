@@ -4,8 +4,6 @@ cluster=${1:?Please provide cluster}
 dir=$(dirname "$0")
 config_file=$dir/context-config
 
-
-
 declare -A configMap
 declare -A titleMap
 
@@ -28,5 +26,4 @@ else
   echo "Switching to cluster=$title"
 
   export KUBECONFIG="$kubeconfig"
-  export KUBE_CLUSTER=$title
 fi

@@ -13,8 +13,10 @@ if [ -z "$config_line" ]; then
   exit 1
 fi
 
+
+
 if [ "$new_terminal" = true ]; then
-  gnome-terminal --title "$KUBE_CLUSTER - ${cluster^} - ${service^}" -- $(dirname "$0")/port_forward.sh "$service"
+  gnome-terminal --title "${KUBECONFIG##*/} - ${cluster^} - ${service^}" -- $(dirname "$0")/port_forward.sh "$service"
 else
   $(dirname "$0")/port_forward.sh "$service"
 fi
