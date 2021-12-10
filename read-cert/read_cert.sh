@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -xuo pipefail
+set -u
 
 usage() {
   echo "Usage: $(basename "$0") CERT_NAME NAMESPACE"
