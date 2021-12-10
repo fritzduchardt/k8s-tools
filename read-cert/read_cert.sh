@@ -6,14 +6,34 @@ usage() {
   echo "Usage: $(basename "$0") CERT_NAME NAMESPACE"
 }
 
+check_prerequisites() {
+  local rc=0
+  if ! command -v kubectl >/dev/null
+  then
+      echo "required command kubectl not found!" >&2
+      rc=1
+  fi
+  if ! command -v openssl >/dev/null
+  then
+      echo "required command openssl not found!" >&2
+      rc=1
+  fi
+  if ! command -v base64 >/dev/null
+  then
+      echo "required command base64 not found!" >&2
+      rc=1
+  fi
+  return "$rc"
+}
+
 check_cert_exists() {
   local cert_name="$1"
   local namespace="$2"
   local rc=0
 
-  kubectl get secret -n $namespace $cert_name || rc=1
+  kubectl get secret -n "$namespace" "$cert_name" > /dev/null 2>&1 || rc=1
 
-  return "${rc}"
+  return "$rc"
 }
 
 read_cert() {
@@ -27,18 +47,29 @@ read_cert() {
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]
 then
+  # parameter validation
   if [[ -z "$1" ]] || [[ -z "$2" ]]
   then
     usage >&2
     exit 2
   fi
+
+  # prerequisite validation
   RC=0
+  check_prerequisites
+  RC="$?"
+  if [[ $RC != 0 ]]; then
+    echo "prerequisites not met"
+    exit 1
+  fi
+
+  # main program
   cert_name="$1"
   namespace="$2"
   check_cert_exists "$cert_name" "$namespace"
   RC="$?"
   if [[ $RC != 0 ]]; then
-    echo "Certificate $cert_name in Namespace $namespace not found" >&2
+    echo "certificate $cert_name in Namespace $namespace not found" >&2
     exit 1
   fi
 
