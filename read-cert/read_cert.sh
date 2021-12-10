@@ -4,6 +4,8 @@ set -u
 
 usage() {
   echo "Usage: $(basename "$0") CERT_NAME NAMESPACE"
+  echo
+  echo "Reads TLC Certificate straight from cluster and decodes it with openssl for perusal of cert details."
 }
 
 check_prerequisites() {
@@ -29,11 +31,8 @@ check_prerequisites() {
 check_cert_exists() {
   local cert_name="$1"
   local namespace="$2"
-  local rc=0
-
-  kubectl get secret -n "$namespace" "$cert_name" > /dev/null 2>&1 || rc=1
-
-  return "$rc"
+  kubectl get secret --field-selector type=kubernetes.io/tls --field-selector metadata.name="$cert_name" -n "$namespace" 2> /dev/null | grep "$cert_name"
+  return "$?"
 }
 
 read_cert() {
@@ -69,7 +68,7 @@ then
   check_cert_exists "$cert_name" "$namespace"
   RC="$?"
   if [[ $RC != 0 ]]; then
-    echo "certificate $cert_name in Namespace $namespace not found" >&2
+    echo "No TLS certificate with name $cert_name was found in namespace $namespace" >&2
     exit 1
   fi
 
