@@ -5,7 +5,7 @@ set -u
 usage() {
   echo "Usage: $(basename "$0") CERT_NAME NAMESPACE"
   echo
-  echo "Reads TLC Certificate straight from cluster and decodes it with openssl for perusal of cert details."
+  echo "Reads TLS Certificate straight from cluster and decodes it with openssl for perusal of cert details."
 }
 
 check_prerequisites() {
@@ -57,7 +57,8 @@ then
   RC=0
   check_prerequisites
   RC="$?"
-  if [[ $RC != 0 ]]; then
+  if [[ $RC != 0 ]]
+  then
     echo "prerequisites not met"
     exit 1
   fi
@@ -67,7 +68,8 @@ then
   namespace="$2"
   check_cert_exists "$cert_name" "$namespace"
   RC="$?"
-  if [[ $RC != 0 ]]; then
+  if [[ $RC != 0 ]]
+  then
     echo "No TLS certificate with name $cert_name was found in namespace $namespace" >&2
     exit 1
   fi
