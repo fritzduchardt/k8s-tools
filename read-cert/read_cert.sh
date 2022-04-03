@@ -3,9 +3,7 @@
 set -u
 
 usage() {
-  echo "Usage: $(basename "$0") CERT_NAME NAMESPACE"
-  echo
-  echo "Reads TLS Certificate straight from cluster and decodes it with openssl for perusal of cert details."
+  echo "Usage: $(basename "$0") ACTION (activate/deactivate)"
 }
 
 check_prerequisites() {
