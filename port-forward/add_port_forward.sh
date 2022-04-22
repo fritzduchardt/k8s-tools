@@ -11,7 +11,7 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]
 then
 
   # parameter validation
-  if [[ ! "$#" -eq 4 ]]
+  if [[ "$#" -ne 4 ]]
   then
     usage >&2
     exit 2

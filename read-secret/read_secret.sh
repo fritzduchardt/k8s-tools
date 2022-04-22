@@ -26,7 +26,7 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]
 then
 
   # parameter validation
-  if [[ ! "$#" -eq 3 ]]
+  if [[ "$#" -ne 3 ]]
   then
     usage >&2
     exit 2
