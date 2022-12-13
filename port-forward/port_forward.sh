@@ -21,7 +21,7 @@ then
   dir="$(dirname "$0")"
   config_file="$dir/port-forward-config"
 
-  config_line="$(grep "${service}#" "$config_file")"
+  config_line="$(grep "^${service}#" "$config_file")"
   config_arr=(${config_line//#/ })
   path="${config_arr[1]}"
   ports="${config_arr[2]}"
