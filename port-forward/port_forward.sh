@@ -1,11 +1,23 @@
 #!/usr/bin/env bash
 
-set -eo pipefail
-
 usage() {
-  echo "Usage: $(basename "$0") SERVICE_NAME"
+  echo "Usage: $(basename "$0") SERVICE_NAME LOOP [PORT_FORWARD_OPTS]"
   echo
   echo "Opens Port-Forward to specified service name. Service name relates to configuration in port-forward-config file."
+}
+
+port_forward() {
+  echo "Starting Port Forwarding to Service: $path within Namespace: $namespace and Port-Mapping: $ports"
+  local -a cmd=(kubectl port-forward "$path" -n "$namespace" "$ports" "${opts[@]}")
+  if [[ "$bg" == "true" ]]; then
+    set -x
+    "${cmd[@]}" > /dev/null &
+    set +x
+  else
+    set -x
+    "${cmd[@]}"
+    set +x
+  fi
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]
@@ -18,6 +30,11 @@ then
   fi
 
   service="$1"
+  loop="$2"
+  bg="$3"
+  shift 3
+  declare -a opts
+  opts=("$@")
   dir="$(dirname "$0")"
   config_file="$dir/port-forward-config"
 
@@ -27,8 +44,11 @@ then
   ports="${config_arr[2]}"
   namespace="${config_arr[3]}"
 
-  while true; do
-    echo "Starting Port Forwarding to Service: $path within Namespace: $namespace and Port-Mapping: $ports"
-    kubectl port-forward "$path" -n "$namespace" "$ports"
-  done
+  if [[ "$loop" == "true" ]]; then
+    while true; do
+      port_forward
+    done
+  else 
+      port_forward
+  fi
 fi

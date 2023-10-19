@@ -32,7 +32,7 @@ then
     exit 1
   fi
 
-  echo -e "${name}#${path}#${ports}#${namespace}\n" >> "$config_file"
+  echo -e "${name}#${path}#${ports}#${namespace}" >> "$config_file"
 
   echo "Port-forward was added"
 fi
