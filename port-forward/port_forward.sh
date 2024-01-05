@@ -8,7 +8,7 @@ usage() {
 
 port_forward() {
   echo "Starting Port Forwarding to Service: $path within Namespace: $namespace and Port-Mapping: $ports"
-  local -a cmd=(kubectl port-forward "$path" -n "$namespace" "$ports" "${opts[@]}")
+  local -a cmd=(kubectl port-forward "$path" -n "$namespace" "$ports" --address 0.0.0.0 "${opts[@]}")
   if [[ "$bg" == "true" ]]; then
     set -x
     "${cmd[@]}" > /dev/null &
