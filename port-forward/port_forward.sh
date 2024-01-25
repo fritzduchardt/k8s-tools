@@ -1,5 +1,12 @@
 #!/usr/bin/env bash
 
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+
+# shellcheck disable=SC1091
+source "$SCRIPT_DIR/../lib/log.sh"
+# shellcheck disable=SC1091
+source "$SCRIPT_DIR/../lib/utils.sh"
+
 usage() {
   echo "Usage: $(basename "$0") SERVICE_NAME LOOP [PORT_FORWARD_OPTS]"
   echo
@@ -7,16 +14,12 @@ usage() {
 }
 
 port_forward() {
-  echo "Starting Port Forwarding to Service: $path within Namespace: $namespace and Port-Mapping: $ports"
+  log::info "Starting Port Forwarding to Service: $path within Namespace: $namespace and Port-Mapping: $ports"
   local -a cmd=(kubectl port-forward "$path" -n "$namespace" "$ports" --address 0.0.0.0 "${opts[@]}")
   if [[ "$bg" == "true" ]]; then
-    set -x
-    "${cmd[@]}" > /dev/null &
-    set +x
+    lib::exec "${cmd[@]}" > /dev/null &
   else
-    set -x
-    "${cmd[@]}"
-    set +x
+    lib::exec  "${cmd[@]}"
   fi
 }
 

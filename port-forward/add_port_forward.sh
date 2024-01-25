@@ -43,5 +43,5 @@ then
 
   echo -e "${name}#${path}#${ports}#${namespace}" >> "$config_file"
 
-  echo "Port-forward was added"
+  log::info "Port-forward was added"
 fi
