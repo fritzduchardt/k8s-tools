@@ -5,10 +5,17 @@ LOG_LEVELS=([trace]=0 [debug]=1 [info]=2 [warn]=3 [error]=4 [fatal]=5)
 LOG_LEVEL="${LOG_LEVEL:-info}"
 LOG_CONTEXT=""
 
+log::_lowercase() {
+  local str="$1"
+  echo "$(echo "$str" | tr '[:upper:]' '[:lower:]')"
+}
+
 log::_islevel() {
-    local level="${1,,}"
-    local global_level_int=${LOG_LEVELS[${LOG_LEVEL,,}]}
-    local current_level_int=${LOG_LEVELS[$level]}
+    local level="${1}"
+    local level_lc="$(log::_lowercase "$level")"
+    local global_lc="$(log::_lowercase "$LOG_LEVEL")"
+    local global_level_int=${LOG_LEVELS[$global_lc]}
+    local current_level_int=${LOG_LEVELS[$level_lc]}
     ((global_level_int <= current_level_int))
 }
 
