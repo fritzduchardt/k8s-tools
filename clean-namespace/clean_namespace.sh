@@ -48,6 +48,10 @@ clean_namespace() {
     lib::exec kubectl delete replicasets "${args[@]}"
     lib::exec kubectl delete daemonsets "${args[@]}"
     lib::exec kubectl delete pods "${args[@]}"
+    lib::exec kubectl delete pvc "${args[@]}"
+    lib::exec kubectl delete roles "${args[@]}"
+    # delete those and render namespaces useless
+    # lib::exec kubectl delete rolebindings "${args[@]}"
     log::info "Removing everything else"
     lib::exec kubectl delete all "${args[@]}"
 }

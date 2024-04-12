@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 set -eo pipefail
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+
+# shellcheck disable=SC1091
+source "$SCRIPT_DIR/../lib/log.sh"
+# shellcheck disable=SC1091
+source "$SCRIPT_DIR/../lib/utils.sh"
 
 usage() {
   echo "Usage: $(basename "$0") SERVICE_NAME [OPTIONS] [PORT_FORWARD_OPTIONS]"
@@ -66,7 +72,7 @@ then
 
   config_line="$(grep "${service_name}#" "$config_file" || true)"
   if [[ -z "$config_line" ]]; then
-    echo "No config found for service $service_name" >&2
+    log::error "No config found for service $service_name" >&2
     exit 1
   fi
 
