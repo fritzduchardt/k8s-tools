@@ -3,25 +3,22 @@
 set -u
 
 usage() {
-  echo "Usage: $(basename "$0") ACTION (activate/deactivate)"
+  echo "Usage: $(basename "$0") ACTION (read/extract) CERT_NAME NAMESPACE" >&2
 }
 
 check_prerequisites() {
   local rc=0
-  if ! command -v kubectl >/dev/null
-  then
-      echo "required command kubectl not found!" >&2
-      rc=1
+  if ! command -v kubectl >/dev/null; then
+    log::error "required command kubectl not found!" >&2
+    rc=1
   fi
-  if ! command -v openssl >/dev/null
-  then
-      echo "required command openssl not found!" >&2
-      rc=1
+  if ! command -v openssl >/dev/null; then
+    log::error "required command openssl not found!" >&2
+    rc=1
   fi
-  if ! command -v base64 >/dev/null
-  then
-      echo "required command base64 not found!" >&2
-      rc=1
+  if ! command -v base64 >/dev/null; then
+    log::error "required command base64 not found!" >&2
+    rc=1
   fi
   return "$rc"
 }
@@ -29,49 +26,58 @@ check_prerequisites() {
 check_cert_exists() {
   local cert_name="$1"
   local namespace="$2"
-  kubectl get secret --field-selector type=kubernetes.io/tls --field-selector metadata.name="$cert_name" -n "$namespace" 2> /dev/null | grep "$cert_name"
+  lib::exec kubectl get secret --field-selector type=kubernetes.io/tls --field-selector metadata.name="$cert_name" -n "$namespace" 2>/dev/null
   return "$?"
 }
 
 read_cert() {
-  local cert_name="$1"
-  local namespace="$2"
-
-  cert=$(kubectl get secret -n "$namespace" "$cert_name" -o jsonpath="{.data.tls\.crt}")
-  cert_decoded=$(echo "$cert" | base64 -d)
-  openssl x509 --noout -text <<<"$cert_decoded"
+  lib::exec openssl x509 --noout -text <<<"$(lib::exec kubectl get secret -n "$namespace" "$cert_name" -o go-template='{{ index .data "tls.crt" | base64decode }}')"
 }
 
-if [[ "${BASH_SOURCE[0]}" == "${0}" ]]
-then
+extract_cert() {
+  lib::exec kubectl get secret -n "$namespace" "$cert_name" -o go-template='{{ index .data "tls.crt" | base64decode }}' >"$cert_name.crt"
+  lib::exec kubectl get secret -n "$namespace" "$cert_name" -o go-template='{{ index .data "tls.key" | base64decode }}' >"$cert_name.key"
+  log::info "Certificate and key extracted to $cert_name.crt and $cert_name.key"
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
   # parameter validation
-  if [[ -z "$1" ]] || [[ -z "$2" ]]
-  then
+  if [[ -z "$1" ]] || [[ -z "$2" ]]; then
     usage >&2
     exit 2
   fi
 
-  # prerequisite validation
-  RC=0
   check_prerequisites
-  RC="$?"
-  if [[ $RC != 0 ]]
-  then
-    echo "prerequisites not met"
+  if ! check_prerequisites; then
+    log::error "prerequisites not met"
     exit 1
   fi
 
-  # main program
-  cert_name="$1"
-  namespace="$2"
-  check_cert_exists "$cert_name" "$namespace"
-  RC="$?"
-  if [[ $RC != 0 ]]
-  then
-    echo "No TLS certificate with name $cert_name was found in namespace $namespace" >&2
+  cmd="$1"
+  cert_name="$2"
+  namespace="$3"
+
+  if ! check_cert_exists "$cert_name" "$namespace"; then
+    log::error "No TLS certificate with name $cert_name was found in namespace $namespace" >&2
     exit 1
   fi
 
-  read_cert "$cert_name" "$namespace"
-  exit 0
+  case "$cmd" in
+  "read")
+    if ! read_cert "$cert_name" "$namespace"; then
+      log::error "Failed to read certificate $cert_name in namespace $namespace" >&2
+      exit 1
+    fi
+    ;;
+  "extract")
+    if ! extract_cert "$cert_name" "$namespace"; then
+      log::error "Failed to extract certificate $cert_name in namespace $namespace" >&2
+      exit 1
+    fi
+    ;;
+  *)
+    usage >&2
+    exit 2
+    ;;
+  esac
 fi
