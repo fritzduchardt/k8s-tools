@@ -88,9 +88,7 @@ then
   done
 
   if [ -z "$namespace" ]; then
-    current_namespace="$(lib::exec k8s::current_namespace)"
-    namespace="$(lib::exec kubectl get ns -oname | sed "s#namespace/##" | fzf --header "Select namespace" --query "$current_namespace")"
-    log::debug "Selected namespace: $namespace"
+    k8s::select_namespace
   fi
 
   if [[ -z "$password" ]]; then
