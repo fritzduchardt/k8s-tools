@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 
 # shellcheck disable=SC1091
 source "$SCRIPT_DIR/../lib/log.sh"
@@ -17,17 +17,15 @@ port_forward() {
   log::info "Starting Port Forwarding to Service: $path within Namespace: $namespace and Port-Mapping: $ports"
   local -a cmd=(kubectl port-forward "$path" -n "$namespace" "$ports" --address 0.0.0.0 "${opts[@]}")
   if [[ "$bg" == "true" ]]; then
-    lib::exec "${cmd[@]}" > /dev/null &
+    lib::exec "${cmd[@]}" >/dev/null &
   else
-    lib::exec  "${cmd[@]}"
+    lib::exec "${cmd[@]}"
   fi
 }
 
-if [[ "${BASH_SOURCE[0]}" == "${0}" ]]
-then
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
   # parameter validation
-  if [[ -z "$1" ]]
-  then
+  if [[ -z "$1" ]]; then
     usage >&2
     exit 2
   fi
@@ -47,11 +45,15 @@ then
   ports="${config_arr[2]}"
   namespace="${config_arr[3]}"
 
+  if [[ -z "$namespace" ]]; then
+    namespace="$(lib::exec kubectl config view --minify --template '{{ (index .contexts 0).context.namespace }}')"
+  fi
+
   if [[ "$loop" == "true" ]]; then
     while true; do
       port_forward
     done
-  else 
-      port_forward
+  else
+    port_forward
   fi
 fi

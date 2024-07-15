@@ -10,7 +10,7 @@ lib::exec() {
   if [[ -z "$DRY_RUN" ]] || [[ "$DRY_RUN" != "true" ]]; then
     log::trace "$command ${*}"
     if ! "$command" "${@}"; then
-      log::error "Failed to execute $command ${*}"
+      log::error "Failed to execute: $command ${*}"
       return 1
     fi
   else
