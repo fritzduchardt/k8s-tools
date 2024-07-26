@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 current_dir=$(dirname "$0")
 # aliases
 alias {port-forward,pf}="$current_dir"/port-forward/launch_port_forward.sh
