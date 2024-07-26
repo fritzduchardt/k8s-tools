@@ -55,7 +55,7 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
   namespace=""
   secret_name=""
   server=""
-  user="none"
+  user=""
 
   while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -110,6 +110,10 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
     namespace="$(k8s::select_namespace)"
   fi
 
+  if [[ -z "$user" ]]; then
+    user="$(fzf::select_from_config "$SCRIPT_DIR/config/users.txt" "Select an user for the secret")"
+  fi
+
   if [[ -z "$email" ]]; then
     email="$(fzf::select_from_config "$SCRIPT_DIR/config/emails.txt" "Select an email for the secret")"
   fi
@@ -118,7 +122,7 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
     server="$(fzf::select_from_config "$SCRIPT_DIR/config/servers.txt" "Select a server url for the secret")"
   fi
 
-  read -rp "Enter password: " password
+  read -rsp "Enter password: " password
 
   if k8s::resource_exists secret "$secret_name" "$namespace"; then
     log::info "Secret $secret_name already exists in namespace $namespace"
