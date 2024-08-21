@@ -37,7 +37,22 @@ k8s::select_namespace() {
 }
 
 k8s::current_namespace() {
+  if ! lib::exec "$KUBECTL_BIN" cluster-info &>/dev/null; then
+    echo "none"
+    return 1
+  fi
   lib::exec "$KUBECTL_BIN" config view --minify --output 'jsonpath={..namespace}'
+}
+
+k8s::current_context() {
+  if ! lib::exec "$KUBECTL_BIN" cluster-info &>/dev/null; then
+    echo "none"
+    return 1
+  fi
+  local -r context_yaml="$(lib::exec "$KUBECTL_BIN" config view)"
+  local -r current_context="$(lib::exec yq '.current-context' <<<"$context_yaml")"
+  local -r context_name="$(lib::exec yq '.contexts.[] | select(.name == "'"$current_context"'") | .context.cluster' <<<"$context_yaml")"
+  echo "${context_name%:*}"
 }
 
 k8s::resource_exists() {

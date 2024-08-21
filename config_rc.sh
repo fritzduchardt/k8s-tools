@@ -10,3 +10,4 @@ alias {remove-config,rc}="$current_dir"/switch-config/remove_config.sh
 alias {read-secret,rs}="$current_dir"/secrets/read_secret.sh
 alias {write-docker-secret,wds}="$current_dir"/secrets/write_docker_secret.sh
 alias cert="$current_dir"/read-cert/read_cert.sh
+alias {cluster-info,ci}="$current_dir"/cluster-info/cluster-info.sh
