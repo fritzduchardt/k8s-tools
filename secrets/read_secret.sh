@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
+source "../lib/log.sh"
+source "../lib/utils.sh"
 
 usage() {
   echo "Usage: $(basename "$0") SECRET_NAME NAMESPACE_NAME FIELD_NAME"
@@ -44,7 +46,7 @@ then
 
   secret="$1"
   namespace="$2"
-  field=$(sed 's#\.#\\.#g' <<<"$3")
+  field="$3"
 
-  kubectl get secret -n "$namespace" "$secret" -o jsonpath="{.data.$field}" | base64 -d
+  lib::exec kubectl get secret -n "$namespace" "$secret" -o go-template='{{ index ".data" '".$field"' | base64 -d }}'
 fi

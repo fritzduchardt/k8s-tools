@@ -1,11 +1,7 @@
 #!/usr/bin/env bash
 
-SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
-
-# shellcheck disable=SC1091
-source "$SCRIPT_DIR/../lib/log.sh"
-# shellcheck disable=SC1091
-source "$SCRIPT_DIR/../lib/utils.sh"
+source "../lib/log.sh"
+source "../lib/utils.sh"
 
 usage() {
   echo "Usage: $(basename "$0") SERVICE_NAME LOOP [PORT_FORWARD_OPTS]"

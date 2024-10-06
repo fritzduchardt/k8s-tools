@@ -1,11 +1,7 @@
 #!/usr/bin/env bash
 set -eo pipefail
-SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-
-# shellcheck disable=SC1091
-source "$SCRIPT_DIR/../lib/log.sh"
-# shellcheck disable=SC1091
-source "$SCRIPT_DIR/../lib/utils.sh"
+source "../lib/log.sh"
+source "../lib/utils.sh"
 
 usage() {
   echo "Usage: $(basename "$0") SERVICE_NAME [OPTIONS] [PORT_FORWARD_OPTIONS]"
@@ -76,7 +72,7 @@ then
     exit 1
   fi
 
-  if [[ -n "$temrinal" ]]; then
+  if [[ -n "$terminal" ]]; then
     "$terminal" --title "${KUBECONFIG##*/} - ${cluster^} - ${service_name^}" -- "$dir"/port_forward.sh "$service_name" "$loop" "$bg" "${opts[@]}"
   else
     "$dir"/port_forward.sh "$service_name" "$loop" "$bg" "${opts[@]}"

@@ -2,12 +2,8 @@
 
 shopt -s globstar # enable globbing
 
-SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-
-# shellcheck disable=SC1091
-source "$SCRIPT_DIR/../lib/log.sh"
-# shellcheck disable=SC1091
-source "$SCRIPT_DIR/../lib/utils.sh"
+source "../lib/log.sh"
+source "../lib/utils.sh"
 
 help() {
     echo """
@@ -18,7 +14,7 @@ Usage:
     $0 NAMESPACE_NAME
 
     Arguments:
-    NAMESPACE_NAME                  Name of namespace to clean out. 
+    NAMESPACE_NAME                  Name of namespace to clean out.
 
     Options:
         -h, --help                  Show this help message
@@ -69,17 +65,14 @@ main() {
             exit 0
             ;;
         --debug | -D)
-            # shellcheck disable=SC2034
             LOG_LEVEL=debug
             shift 1
             ;;
         --trace | -T)
-            # shellcheck disable=SC2034
             LOG_LEVEL=trace
             shift 1
             ;;
         --dry-run | -d)
-            # shellcheck disable=SC2034
             DRY_RUN=true
             shift 1
             ;;
@@ -107,15 +100,8 @@ main() {
     fi
 
 
-    echo "Ready to clean namespace \"$namespace\". Go ahead?"
-    select yn in "Yes" "No"; do
-        if [[ "$yn" == "No" ]]; then 
-            log::info "Aborting - good bye."
-            exit 0
-        else
-            break
-        fi
-    done
+    echo "Ready to clean namespace \"$namespace\"."
+    lib::prompt "Go ahead?"
 
     clean_namespace "$namespace"
 
@@ -124,4 +110,3 @@ main() {
 
 
 main "$@"
-

@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+source "../lib/log.sh"
+source "../lib/utils.sh"
 
 set -u
 

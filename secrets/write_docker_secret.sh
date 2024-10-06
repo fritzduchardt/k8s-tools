@@ -1,12 +1,9 @@
 #!/usr/bin/env bash
 set -eo pipefail
 
-SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 
-# shellcheck source=./../lib/log.sh
-source "$SCRIPT_DIR/../lib/log.sh"
-# shellcheck source=./../lib/utils.sh
-source "$SCRIPT_DIR/../lib/utils.sh"
+source "../lib/log.sh"
+source "../lib/utils.sh"
 
 usage() {
   cat >&2 <<EOF
@@ -70,10 +67,6 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
       LOG_LEVEL="trace"
       shift 1
       ;;
-    --dry-run)
-      DRY_RUN="true"
-      shift 1
-      ;;
     --namespace | -n)
       namespace="$2"
       shift 2
@@ -103,7 +96,7 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
   done
 
   if [[ -z "$secret_name" ]]; then
-    secret_name="$(fzf::select_from_config "$SCRIPT_DIR/config/names.txt" "Select a name for the secret")"
+    secret_name="$(fzf::select_from_config "$(dirname "$0")/config/names.txt" "Select a name for the secret")"
   fi
 
   if [ -z "$namespace" ]; then
@@ -111,15 +104,15 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
   fi
 
   if [[ -z "$user" ]]; then
-    user="$(fzf::select_from_config "$SCRIPT_DIR/config/users.txt" "Select an user for the secret")"
+    user="$(fzf::select_from_config "$(dirname "$0")/config/users.txt" "Select an user for the secret")"
   fi
 
   if [[ -z "$email" ]]; then
-    email="$(fzf::select_from_config "$SCRIPT_DIR/config/emails.txt" "Select an email for the secret")"
+    email="$(fzf::select_from_config "$(dirname "$0")/config/emails.txt" "Select an email for the secret")"
   fi
 
   if [[ -z "$server" ]]; then
-    server="$(fzf::select_from_config "$SCRIPT_DIR/config/servers.txt" "Select a server url for the secret")"
+    server="$(fzf::select_from_config "$(dirname "$0")/config/servers.txt" "Select a server url for the secret")"
   fi
 
   read -rsp "Enter password: " password
