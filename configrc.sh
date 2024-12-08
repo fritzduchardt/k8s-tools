@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-script_dir="$(dirname "$0")"
+script_dir="$(dirname -- "${BASH_SOURCE[0]:-${0}}")"
 
 lib::exec_k8s_tool() {
   local dir="$1" script="$2"
