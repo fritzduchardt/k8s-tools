@@ -12,7 +12,7 @@ alias {clean-namespace,cn}="lib::exec_k8s_tool $script_dir/clean-namespace clean
 
 # ports
 alias {port-forward,pf}="lib::exec_k8s_tool $script_dir/port-forward launch_port_forward.sh"
-alias {add-port-forward,ap}="lib::exec_k8s_tool $script_dir/port-forward add_port_forward.sh"
+alias {pf-add-port-forward,pfa}="lib::exec_k8s_tool $script_dir/port-forward add_port_forward.sh"
 
 # secrets
 alias {read-secret,rs}="lib::exec_k8s_tool $script_dir/secrets read_secret.sh"

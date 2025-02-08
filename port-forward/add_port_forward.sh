@@ -37,7 +37,7 @@ then
     exit 1
   fi
 
-  echo -e "${name}#${path}#${ports}#${namespace}" >> "$config_file"
+  echo -e "$name#$path#$ports#$namespace" >> "$config_file"
 
   log::info "Port-forward was added"
 fi

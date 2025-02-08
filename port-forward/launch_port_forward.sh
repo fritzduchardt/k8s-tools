@@ -10,14 +10,12 @@ usage() {
   echo "Provides flag to open Port Forward in new terminal"
   echo
   echo "Options:"
-  echo "  -t, --terminal    Type of terminal that is used for launch of port-forward (default gnome-terminal)"
   echo "  -l, --loop        Start port-forward in loop to recreate connection if it breaks"
   echo "  -b, --bg          Start port-forward as background process"
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]
 then
-    terminal="gnome-terminal"
     service_name=""
     loop="false"
     bg="false"
@@ -29,10 +27,6 @@ then
         --help | -h)
             usage
             exit 0
-            ;;
-        --terminal | -t)
-            terminal="$2"
-            shift 2
             ;;
         --loop | -l)
             loop="true"
@@ -72,9 +66,5 @@ then
     exit 1
   fi
 
-  if [[ -n "$terminal" ]]; then
-    "$terminal" --title "${KUBECONFIG##*/} - ${cluster^} - ${service_name^}" -- "$dir"/port_forward.sh "$service_name" "$loop" "$bg" "${opts[@]}"
-  else
-    "$dir"/port_forward.sh "$service_name" "$loop" "$bg" "${opts[@]}"
-  fi
+  "$dir"/port_forward.sh "$service_name" "$loop" "$bg" "${opts[@]}"
 fi
