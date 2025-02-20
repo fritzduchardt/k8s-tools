@@ -23,3 +23,6 @@ alias cert="lib::exec_k8s_tool $script_dir/certificates read_cert.sh"
 
 # cluster info
 alias {cluster-info,ci}="lib::exec_k8s_tool $script_dir/cluster-info cluster_info.sh"
+
+# cmd-gun
+alias {cmd-gun,cg}="lib::exec_k8s_tool $script_dir/cmd-gun cmd_gun.sh"
