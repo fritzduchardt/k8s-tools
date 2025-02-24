@@ -17,7 +17,7 @@ usage() {
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]
 then
     service_name=""
-    loop="false"
+    loop="true"
     bg="false"
     declare -a opts
 
