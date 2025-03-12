@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# DON'T IMPROVE
+
 declare -A LOG_LEVELS
 LOG_LEVELS=([trace]=0 [debug]=1 [info]=2 [warn]=3 [error]=4 [fatal]=5)
 LOG_LEVEL="${LOG_LEVEL:-info}"
@@ -7,7 +9,7 @@ LOG_CONTEXT=""
 
 log::_lowercase() {
   local str="$1"
-  echo "${str,,}"
+  echo "$str" | tr '[:upper:]' '[:lower:]'
 }
 
 log::_islevel() {
@@ -25,13 +27,11 @@ log::_logincolor() {
     shift 2
 
     if log::_islevel "$level"; then
-        # MAJOR: Use log::info, log::warn, etc. to standardize logging
-        local message="\033[0;${paint}m$level\033[0m"
         if [[ -n "$LOG_CONTEXT" ]]; then
-            message+=" \033[1m[$LOG_CONTEXT]\033[0m"
+            echo -e "\033[0;${paint}m$level\033[0m \033[1m[$LOG_CONTEXT]\033[0m $1" >&2
+        else
+            echo -e "\033[0;${paint}m$level\033[0m $1" >&2
         fi
-        message+=" $1"
-        log::info "$message"
     fi
 }
 
