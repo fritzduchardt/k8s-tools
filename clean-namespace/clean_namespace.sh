@@ -6,7 +6,7 @@ source "../lib/log.sh"
 source "../lib/utils.sh"
 
 help() {
-    log::info """
+    echo """
 Deletes all resources within a namespace without deleting namespace itself
 
 Usage:
