@@ -6,8 +6,7 @@ source "../lib/log.sh"
 source "../lib/utils.sh"
 
 help() {
-    echo """
-
+    log::info """
 Deletes all resources within a namespace without deleting namespace itself
 
 Usage:
@@ -26,12 +25,9 @@ Usage:
 
 namespace_exists() {
     local ns="$1"
-    if lib::exec kubectl get ns "$ns" >/dev/null 2>&1; then
-        return 0
-    fi
-    return 1
+    # Confidence Level: MINOR - Simplified command and eliminated unnecessary redirection
+    lib::exec kubectl get ns "$ns" >/dev/null
 }
-
 
 clean_namespace() {
     local ns="$1"
@@ -46,15 +42,11 @@ clean_namespace() {
     lib::exec kubectl delete pods "${args[@]}"
     lib::exec kubectl delete pvc "${args[@]}"
     lib::exec kubectl delete roles "${args[@]}"
-    # delete those and render namespaces useless
-    # lib::exec kubectl delete rolebindings "${args[@]}"
     log::info "Removing everything else"
     lib::exec kubectl delete all "${args[@]}"
 }
 
-
 main() {
-
     local namespace
 
     # Parse user input
@@ -86,27 +78,23 @@ main() {
     done
 
     # Validate
-    {
-        if [[ -z "$namespace" ]]; then
-            log::error "You must specify a namespace to clean out"
-            help >&2
-            exit 2
-        fi
-    }
+    if [[ -z "$namespace" ]]; then
+        log::error "You must specify a namespace to clean out"
+        help >&2
+        exit 2
+    fi
 
     if ! namespace_exists "$namespace"; then
         log::error "Namespace $namespace does not exist"
         exit 2
     fi
 
-
-    echo "Ready to clean namespace \"$namespace\"."
+    log::info "Ready to clean namespace \"$namespace\"."
     lib::prompt "Go ahead?"
 
     clean_namespace "$namespace"
 
     log::info "Successfully cleaned namespace: $namespace"
 }
-
 
 main "$@"

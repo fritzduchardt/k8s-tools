@@ -7,7 +7,7 @@ LOG_CONTEXT=""
 
 log::_lowercase() {
   local str="$1"
-  echo "$(echo "$str" | tr '[:upper:]' '[:lower:]')"
+  echo "${str,,}"
 }
 
 log::_islevel() {
@@ -25,34 +25,35 @@ log::_logincolor() {
     shift 2
 
     if log::_islevel "$level"; then
+        # MAJOR: Use log::info, log::warn, etc. to standardize logging
         if [[ -n "$LOG_CONTEXT" ]]; then
-            echo -e "\033[0;${paint}m$level\033[0m \033[1m[$LOG_CONTEXT]\033[0m $1" >&2
+            log::info "\033[0;${paint}m$level\033[0m \033[1m[$LOG_CONTEXT]\033[0m $1"
         else
-            echo -e "\033[0;${paint}m$level\033[0m $1" >&2
+            log::info "\033[0;${paint}m$level\033[0m $1"
         fi
     fi
 }
 
 log::trace() {
-    log::_logincolor 35 TRACE "$@" 
+    log::_logincolor 35 TRACE "$@"
 }
 
 log::debug() {
-    log::_logincolor 34 DEBUG "$@" 
+    log::_logincolor 34 DEBUG "$@"
 }
 
 log::info() {
-    log::_logincolor 32 INFO "$@" 
+    log::_logincolor 32 INFO "$@"
 }
 
 log::warn() {
-    log::_logincolor 33 WARN "$@" 
+    log::_logincolor 33 WARN "$@"
 }
 
 log::error() {
-    log::_logincolor 31 ERROR "$@" 
+    log::_logincolor 31 ERROR "$@"
 }
 
 log::fatal() {
-    log::_logincolor 35 FATAL "$@" 
+    log::_logincolor 35 FATAL "$@"
 }

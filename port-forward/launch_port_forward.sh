@@ -14,8 +14,7 @@ usage() {
   echo "  -b, --bg          Start port-forward as background process"
 }
 
-if [[ "${BASH_SOURCE[0]}" == "${0}" ]]
-then
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
     service_name=""
     loop="true"
     bg="false"
@@ -41,30 +40,29 @@ then
                 service_name="$1"
                 shift 1
             else
-              break;
+              break
             fi
             ;;
         esac
     done
 
-  opts=("$@")
+    opts=("$@")
 
-  # parameter validation
-  if [[ -z "$service_name" ]]
-  then
-    usage
-    exit 2
-  fi
+    # parameter validation
+    if [[ -z "$service_name" ]]; then
+        usage
+        exit 2
+    fi
 
-  dir="$(dirname "$0")"
-  config_file="$dir/port-forward-config"
-  cluster="$(kubectl config current-context)"
+    dir="$(dirname "$0")"
+    config_file="$dir/port-forward-config"
+    cluster="$(kubectl config current-context)"
 
-  config_line="$(grep "${service_name}#" "$config_file" || true)"
-  if [[ -z "$config_line" ]]; then
-    log::error "No config found for service $service_name" >&2
-    exit 1
-  fi
+    config_line="$(grep "${service_name}#" "$config_file" || true)"
+    if [[ -z "$config_line" ]]; then
+        log::error "No config found for service $service_name" >&2
+        exit 1
+    fi
 
-  "$dir"/port_forward.sh "$service_name" "$loop" "$bg" "${opts[@]}"
+    "$dir"/port_forward.sh "$service_name" "$loop" "$bg" "${opts[@]}"
 fi

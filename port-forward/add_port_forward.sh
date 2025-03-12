@@ -11,12 +11,9 @@ usage() {
   echo "Registers new service in port-forward-config file so that a Port Forwarding to it can be opened with port-forward.sh"
 }
 
-if [[ "${BASH_SOURCE[0]}" == "${0}" ]]
-then
-
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
   # parameter validation
-  if [[ "$#" -ne 4 ]]
-  then
+  if [[ "$#" -ne 4 ]]; then
     log::error "Invalid number of parameters"
     usage >&2
     exit 2
@@ -32,12 +29,12 @@ then
 
   count="$(grep -c "$name" "$config_file" || true)"
 
-  if [ "$count" -gt 0 ]; then
+  if [[ "$count" -gt 0 ]]; then
     echo "Config for \"${name}\" does already exist" >&2
     exit 1
   fi
 
-  echo -e "$name#$path#$ports#$namespace" >> "$config_file"
+  printf "%s#%s#%s#%s\n" "$name" "$path" "$ports" "$namespace" >> "$config_file"
 
   log::info "Port-forward was added"
 fi

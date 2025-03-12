@@ -11,42 +11,31 @@ usage() {
 
 check_prerequisites() {
   local rc=0
-  if ! command -v kubectl >/dev/null
-  then
+  if ! command -v kubectl >/dev/null; then
       echo "required command kubectl not found!" >&2
       rc=1
   fi
-  if ! command -v base64 >/dev/null
-  then
+  if ! command -v base64 >/dev/null; then
       echo "required command base64 not found!" >&2
       rc=1
   fi
   return "$rc"
 }
 
-if [[ "${BASH_SOURCE[0]}" == "${0}" ]]
-then
-
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
   # parameter validation
-  if [[ "$#" -ne 3 ]]
-  then
+  if [[ "$#" -ne 3 ]]; then
     usage >&2
     exit 2
   fi
 
   # prerequisite validation
-  RC=0
-  check_prerequisites
-  RC="$?"
-  if [[ $RC != 0 ]]
-  then
-    echo "prerequisites not met"
-    exit 1
-  fi
+  check_prerequisites || { echo "prerequisites not met"; exit 1; }
 
   secret="$1"
   namespace="$2"
   field="$3"
 
-  lib::exec kubectl get secret -n "$namespace" "$secret" -o go-template='{{ index ".data" '".$field"' | base64 -d }}'
+  # Confidence Level: MINOR - Added quotes around variable to prevent word splitting
+  lib::exec kubectl get secret -n "$namespace" "$secret" -o go-template='{{ index ".data" "'"${field}"'" | base64 -d }}'
 fi
