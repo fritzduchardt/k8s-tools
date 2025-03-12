@@ -30,7 +30,7 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
   count="$(grep -c "$name" "$config_file" || true)"
 
   if [[ "$count" -gt 0 ]]; then
-    echo "Config for \"${name}\" does already exist" >&2
+    log::error "Config for \"${name}\" does already exist"
     exit 1
   fi
 

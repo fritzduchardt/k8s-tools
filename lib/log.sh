@@ -26,11 +26,12 @@ log::_logincolor() {
 
     if log::_islevel "$level"; then
         # MAJOR: Use log::info, log::warn, etc. to standardize logging
+        local message="\033[0;${paint}m$level\033[0m"
         if [[ -n "$LOG_CONTEXT" ]]; then
-            log::info "\033[0;${paint}m$level\033[0m \033[1m[$LOG_CONTEXT]\033[0m $1"
-        else
-            log::info "\033[0;${paint}m$level\033[0m $1"
+            message+=" \033[1m[$LOG_CONTEXT]\033[0m"
         fi
+        message+=" $1"
+        log::info "$message"
     fi
 }
 

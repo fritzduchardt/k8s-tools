@@ -8,6 +8,7 @@ shift 1
 
 while IFS= read -r ns; do
   ns="${ns#*/}"
+  log::info "Switching to namespace: $ns"
   kubectl config set-context --current --namespace="$ns"
   "$@"
 done < <(kubectl get ns -oname | grep -o "^namespace/$ns_prefix.*")

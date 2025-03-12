@@ -56,7 +56,6 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
 
     dir="$(dirname "$0")"
     config_file="$dir/port-forward-config"
-    cluster="$(kubectl config current-context)"
 
     config_line="$(grep "${service_name}#" "$config_file" || true)"
     if [[ -z "$config_line" ]]; then

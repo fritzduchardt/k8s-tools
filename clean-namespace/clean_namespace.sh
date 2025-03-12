@@ -25,15 +25,13 @@ Usage:
 
 namespace_exists() {
     local ns="$1"
-    # Confidence Level: MINOR - Simplified command and eliminated unnecessary redirection
     lib::exec kubectl get ns "$ns" >/dev/null
 }
 
 clean_namespace() {
     local ns="$1"
     local -a args
-    args=("--all" "--wait=true" "-n" "$ns" )
-    # Removing workloads before everything else to free up pvcs
+    args=("--all" "--wait=true" "-n" "$ns")
     log::info "Removing all workloads"
     lib::exec kubectl delete statefulsets "${args[@]}"
     lib::exec kubectl delete deployments "${args[@]}"
