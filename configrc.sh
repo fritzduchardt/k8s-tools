@@ -4,12 +4,10 @@ script_dir="$(dirname -- "${BASH_SOURCE[0]:-${0}}")"
 lib::exec_k8s_tool() {
   local dir="$1" script="$2"
   shift 2
-  # MINOR: Added quotes around variables to prevent word splitting and globbing
   (cd "$dir" && ./"$script" "$@")
 }
 
 # namespace
-# MINOR: Added quotes around the alias command for better readability
 alias {clean-namespace,cn}="lib::exec_k8s_tool \"$script_dir/clean-namespace\" clean_namespace.sh"
 
 # ports
