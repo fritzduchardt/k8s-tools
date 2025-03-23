@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-KUBECTL_BIN=${KUBECTL_BIN:-kubectl}
+KUBECTL_BIN="${KUBECTL_BIN:-kubectl}"
 
 # Execute any binary
 lib::exec() {
