@@ -1,19 +1,23 @@
 #!/usr/bin/env bash
 
-# DON'T IMPROVE
-
-declare -A LOG_LEVELS
-LOG_LEVELS=([trace]=0 [debug]=1 [info]=2 [warn]=3 [error]=4 [fatal]=5)
+declare -A LOG_LEVELS=(
+  [trace]=0
+  [debug]=1
+  [info]=2
+  [warn]=3
+  [error]=4
+  [fatal]=5
+)
 LOG_LEVEL="${LOG_LEVEL:-info}"
 LOG_CONTEXT=""
 
 log::_lowercase() {
   local str="$1"
-  echo "$str" | tr '[:upper:]' '[:lower:]'
+  tr '[:upper:]' '[:lower:]' <<< "$str"
 }
 
 log::_islevel() {
-    local level="${1}"
+    local level="$1"
     local level_lc="$(log::_lowercase "$level")"
     local global_lc="$(log::_lowercase "$LOG_LEVEL")"
     local global_level_int=${LOG_LEVELS[$global_lc]}
