@@ -1,19 +1,19 @@
 #!/usr/bin/env bash
 
-KUBECTL_BIN="${KUBECTL_BIN:-kubectl}"
+KUBECTL_BIN=${KUBECTL_BIN:-kubectl}
 
 # Execute any binary
 lib::exec() {
   local command="$1"
   shift
   if [[ -z "$DRY_RUN" ]] || [[ "$DRY_RUN" != "true" ]]; then
-    log::trace "$command ${*}"
-    if ! "$command" "${@}"; then
-      log::error "Failed to execute: $command ${*}"
+    log::trace "$command $*"
+    if ! "$command" "$@"; then
+      log::error "Failed to execute: $command $*"
       return 1
     fi
   else
-    log::info "DRY-RUN: $command ${*}"
+    log::info "DRY-RUN: $command $*"
   fi
 }
 
@@ -31,9 +31,9 @@ lib::prompt() {
 }
 
 fzf::select_from_config() {
-  local config_file="${1}"
-  local header="${2}"
-  local query="${3}"
+  local config_file="$1"
+  local header="$2"
+  local query="$3"
   local entry
 
   if ! entry="$(lib::exec fzf --print-query --header "$header" --query "$query" <"$config_file")"; then
