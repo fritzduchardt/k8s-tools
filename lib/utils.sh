@@ -18,16 +18,11 @@ lib::exec() {
 }
 
 lib::prompt() {
-    local msg="${1:-Are your sure?}" yn
-    log::warn "$msg"
-    select yn in "yes" "no"; do
-        if [[ "$yn" == "no" ]]; then
-            log::info "Aborting - good bye."
-            exit 0
-        else
-            break
-        fi
-    done
+  local -r msg="$(echo -e "yes\nno" | fzf --ghost "Are your sure?")"
+  if [[ "$msg" != "yes" ]]; then
+    log::info "Aborting - good bye."
+    exit 1
+  fi
 }
 
 fzf::select_from_config() {
