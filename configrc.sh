@@ -26,3 +26,6 @@ alias {cluster-info,ci}="lib::exec_k8s_tool \"$script_dir/cluster-info\" cluster
 
 # cmd-gun
 alias {cmd-gun,cg}="lib::exec_k8s_tool \"$script_dir/cmd-gun\" cmd_gun.sh"
+
+# misc
+alias {explain,exp}="lib::exec_k8s_tool \"$script_dir/misc\" explain.sh"
