@@ -12,7 +12,8 @@ lib::exec() {
 }
 
 lib::prompt() {
-  local -r msg="$(echo -e "yes\nno" | fzf --ghost "Are your sure?")"
+  local msg="${1:-Are you sure?}"
+  local -r msg="$(echo -e "yes\nno" | fzf --ghost "$msg")"
   if [[ "$msg" != "yes" ]]; then
     log::info "Aborting - good bye."
     exit 1
