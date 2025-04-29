@@ -35,7 +35,7 @@ get_recursive_explain() {
     fzf --height 80% \
         --border \
         --prompt "$resource.spec > " \
-        --preview "grep -A 100 {} $tempfile" \
+        --preview "grep -C 30 {} $tempfile" \
         --preview-window=right:60%:wrap \
         <"$tempfile" >/dev/null
 }
