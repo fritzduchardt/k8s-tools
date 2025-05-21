@@ -2,8 +2,6 @@
 source "../lib/log.sh"
 source "../lib/utils.sh"
 
-set -u
-
 usage() {
   echo "Usage: $(basename "$0") ACTION (read/extract) CERT_NAME NAMESPACE" >&2
 }
@@ -28,8 +26,11 @@ check_prerequisites() {
 check_cert_exists() {
   local cert_name="$1"
   local namespace="$2"
-  lib::exec kubectl get secret --field-selector type=kubernetes.io/tls --field-selector metadata.name="$cert_name" -n "$namespace" 2>/dev/null
-  return "$?"
+  cert="$(lib::exec kubectl get secret --field-selector type=kubernetes.io/tls --field-selector metadata.name="$cert_name" -n "$namespace")"
+  if [[ -n "$cert" ]]; then
+    return 0
+  fi
+  return 1
 }
 
 read_cert() {
@@ -60,20 +61,22 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
   namespace="$3"
 
   if ! check_cert_exists "$cert_name" "$namespace"; then
-    log::error "No TLS certificate with name $cert_name was found in namespace $namespace" >&2
+    log::error "No TLS certificate with name $cert_name was found in namespace $namespace"
     exit 1
   fi
+
+  log::info "Cert found: $cert_name"
 
   case "$cmd" in
   "read")
     if ! read_cert "$cert_name" "$namespace"; then
-      log::error "Failed to read certificate $cert_name in namespace $namespace" >&2
+      log::error "Failed to read certificate $cert_name in namespace $namespace"
       exit 1
     fi
     ;;
   "extract")
     if ! extract_cert "$cert_name" "$namespace"; then
-      log::error "Failed to extract certificate $cert_name in namespace $namespace" >&2
+      log::error "Failed to extract certificate $cert_name in namespace $namespace"
       exit 1
     fi
     ;;
