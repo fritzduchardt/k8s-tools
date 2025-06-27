@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -eo pipefail
 source "../lib/log.sh"
 source "../lib/utils.sh"
 
@@ -24,7 +24,7 @@ check_prerequisites() {
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
   # parameter validation
-  if [[ "$#" -ne 3 ]]; then
+  if [[ "$#" -ne 2 ]]; then
     usage >&2
     exit 2
   fi
@@ -33,8 +33,12 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
   check_prerequisites || { log::error "prerequisites not met"; exit 1; }
 
   secret="$1"
-  namespace="$2"
-  field="$3"
+  field="$2"
+  namespace="$3"
 
-  lib::exec kubectl get secret -n "$namespace" "$secret" -o go-template='{{ index ".data" "'"${field}"'" | base64 -d }}'
+  if [[ -z "$namespace" ]]; then
+    namespace="$(k8s::current_namespace)"
+  fi
+
+  lib::exec kubectl get secret -n "$namespace" "$secret" -o jsonpath="{.data.$field}" | base64 -d
 fi

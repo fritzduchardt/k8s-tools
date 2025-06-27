@@ -60,10 +60,15 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
   cert_name="$2"
   namespace="$3"
 
+  if [[ -z "$namespace" ]]; then
+    namespace="$(k8s::current_namespace)"
+  fi
+
   if ! check_cert_exists "$cert_name" "$namespace"; then
     log::error "No TLS certificate with name $cert_name was found in namespace $namespace"
     exit 1
   fi
+
 
   log::info "Cert found: $cert_name"
 
