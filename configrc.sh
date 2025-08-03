@@ -29,3 +29,4 @@ alias {cmd-gun,cg}="lib::exec_k8s_tool \"$script_dir/cmd-gun\" cmd_gun.sh"
 
 # misc
 alias {explain,exp}="lib::exec_k8s_tool \"$script_dir/misc\" explain.sh"
+alias rm-finalizer="lib::exec_k8s_tool \"$script_dir/misc\" rm_finalizers.sh"
