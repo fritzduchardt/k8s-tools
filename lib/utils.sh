@@ -39,7 +39,7 @@ k8s::select_namespace() {
 
 k8s::current_namespace() {
   if ! lib::exec "$KUBECTL_BIN" cluster-info &>/dev/null; then
-    echo "none"
+    log::error "Failed to retrieve current namespace"
     return 1
   fi
   lib::exec "$KUBECTL_BIN" config view --minify --output 'jsonpath={..namespace}'

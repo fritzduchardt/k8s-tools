@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -eo pipefail
+set -uo pipefail
 
 SCRIPT_DIR="$(dirname -- "$0")"
 source "$SCRIPT_DIR/../lib/log.sh"
@@ -9,7 +9,7 @@ source "$SCRIPT_DIR/../lib/utils.sh"
 # Prints usage information and exits.
 usage() {
     cat <<EOF
-Usage: "$0" <namespace>
+Usage: "$0" [-n NAMESPACE]
 
 Removes finalizers and then deletes ArgoCD Custom Resources (Applications,
 ApplicationSets, and AppProjects) from the specified Kubernetes namespace.
@@ -17,8 +17,9 @@ ApplicationSets, and AppProjects) from the specified Kubernetes namespace.
 This is a destructive operation that should be used with caution, for example,
 when a namespace is stuck in a terminating state due to ArgoCD finalizers.
 
-ARGUMENTS:
-  <namespace>   The Kubernetes namespace to clean up. Required.
+OPTIONS:
+  -n NAMESPACE   The Kubernetes namespace to clean up. If not provided, the current namespace will be used.
+  -h, --help     Display this help message and exit.
 EOF
     exit 1
 }
@@ -35,7 +36,7 @@ cleanup_resources() {
 
     # Get resource names. If the command returns no names, the loop won't execute.
     local resources
-    resources=$(kubectl get "$resource_type" -n "$namespace" -o jsonpath='{.items[*].metadata.name}' 2>/dev/null || true)
+    resources=$("$KUBECTL_BIN" get "$resource_type" -n "$namespace" -o jsonpath='{.items[*].metadata.name}' 2>/dev/null || true)
 
     if [[ -z "$resources" ]]; then
         log::info "No '$resource_type' resources found in namespace '$namespace'."
@@ -49,13 +50,13 @@ cleanup_resources() {
         log::info "  -> Removing finalizer..."
         # The patch command fails if there are no finalizers. We check the exit code
         # to handle the expected error without stopping the script due to `set -e`.
-        if ! kubectl patch "$resource_type" "$name" -n "$namespace" --type='json' -p='[{"op": "remove", "path": "/metadata/finalizers"}]' &>/dev/null; then
+        if ! "$KUBECTL_BIN" patch "$resource_type" "$name" -n "$namespace" --type='json' -p='[{"op": "remove", "path": "/metadata/finalizers"}]' &>/dev/null; then
             log::warn "     Could not remove finalizer from \"$resource_type\" '$name'. It might not have one or was already deleted."
         fi
 
         log::info "  -> Deleting resource..."
         # --ignore-not-found is used in case the resource was deleted between the 'get' and 'delete' operations.
-        kubectl delete "$resource_type" "$name" -n "$namespace" --ignore-not-found=true
+        "$KUBECTL_BIN" delete "$resource_type" "$name" -n "$namespace" --ignore-not-found=true
     done
 
     log::info "--- Finished processing resource type: \"$resource_type\" ---"
@@ -65,7 +66,7 @@ cleanup_resources() {
 verify_namespace() {
     local namespace="$1"
 
-    if ! kubectl get namespace "$namespace" &>/dev/null; then
+    if ! "$KUBECTL_BIN" get namespace "$namespace" &>/dev/null; then
         log::error "Namespace '$namespace' does not exist"
         exit 1
     fi
@@ -73,10 +74,32 @@ verify_namespace() {
 
 # Main function to orchestrate the cleanup process.
 main() {
-    if [[ "$1" == "-h" || "$1" == "--help" || -z "$1" ]]; then
-        usage
+    local namespace=""
+
+    # Parse command line options
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            -n)
+                namespace="$2"
+                shift 2
+                ;;
+            -h|--help)
+                usage
+                ;;
+            *)
+                log::error "Unknown option: $1"
+                usage
+                ;;
+        esac
+    done
+
+    # If namespace is not provided, get the current namespace
+    if [[ -z "$namespace" ]]; then
+        if ! namespace="$(k8s::current_namespace)"; then
+          exit 1
+        fi
+        log::info "No namespace provided, using current namespace: '$namespace'"
     fi
-    local namespace="$1"
 
     log::info "Starting ArgoCD CR cleanup in namespace: '$namespace'"
 
