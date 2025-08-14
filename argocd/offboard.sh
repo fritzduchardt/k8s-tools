@@ -1,12 +1,11 @@
 #!/usr/bin/env bash
 
-set -uo pipefail
+set -euo pipefail
 
 SCRIPT_DIR="$(dirname -- "$0")"
 source "$SCRIPT_DIR/../lib/log.sh"
 source "$SCRIPT_DIR/../lib/utils.sh"
 
-# Prints usage information and exits.
 usage() {
     cat <<EOF
 Usage: "$0" [-n NAMESPACE]
@@ -24,10 +23,7 @@ EOF
     exit 1
 }
 
-# cleanup_resources removes finalizers and deletes all instances of a given resource type in a namespace.
-# Arguments:
-#   $1: The resource type (e.g., 'applications', 'applicationsets').
-#   $2: The namespace.
+# Removes finalizers and deletes all instances of a given resource type in a namespace.
 cleanup_resources() {
     local resource_type="$1"
     local namespace="$2"
@@ -48,21 +44,17 @@ cleanup_resources() {
         log::info "Processing \"$resource_type\" '$name'..."
 
         log::info "  -> Removing finalizer..."
-        # The patch command fails if there are no finalizers. We check the exit code
-        # to handle the expected error without stopping the script due to `set -e`.
         if ! "$KUBECTL_BIN" patch "$resource_type" "$name" -n "$namespace" --type='json' -p='[{"op": "remove", "path": "/metadata/finalizers"}]' &>/dev/null; then
             log::warn "     Could not remove finalizer from \"$resource_type\" '$name'. It might not have one or was already deleted."
         fi
 
         log::info "  -> Deleting resource..."
-        # --ignore-not-found is used in case the resource was deleted between the 'get' and 'delete' operations.
         "$KUBECTL_BIN" delete "$resource_type" "$name" -n "$namespace" --ignore-not-found=true
     done
 
     log::info "--- Finished processing resource type: \"$resource_type\" ---"
 }
 
-# verify_namespace checks if the specified namespace exists
 verify_namespace() {
     local namespace="$1"
 
@@ -72,7 +64,6 @@ verify_namespace() {
     fi
 }
 
-# Main function to orchestrate the cleanup process.
 main() {
     local namespace=""
 
@@ -93,7 +84,6 @@ main() {
         esac
     done
 
-    # If namespace is not provided, get the current namespace
     if [[ -z "$namespace" ]]; then
         if ! namespace="$(k8s::current_namespace)"; then
           exit 1
@@ -103,10 +93,9 @@ main() {
 
     log::info "Starting ArgoCD CR cleanup in namespace: '$namespace'"
 
-    # Verify namespace exists
     verify_namespace "$namespace"
 
-    # Define the ArgoCD resource types to be processed.
+    # Define the ArgoCD resource types to be processed
     local -r resource_types=("applications.argoproj.io" "applicationsets.argoproj.io" "appprojects.argoproj.io")
 
     local rt
@@ -117,7 +106,6 @@ main() {
     log::info "Cleanup of ArgoCD CRs in namespace '$namespace' completed successfully."
 }
 
-# Ensures the script is not being sourced and executes the main function with all provided arguments.
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
     main "$@"
 fi
