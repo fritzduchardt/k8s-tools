@@ -34,8 +34,6 @@ cleanup_resources() {
     log::info "--- Processing resource type: \"$resource_type\" in namespace '$namespace' ---"
 
     # Get resource names. If the command returns no names, the loop won't execute.
-    # `|| true` ensures that the script does not exit if kubectl returns a non-zero status
-    # (e.g., for "No resources found" message in some versions).
     local resources
     resources=$(kubectl get "$resource_type" -n "$namespace" -o jsonpath='{.items[*].metadata.name}' 2>/dev/null || true)
 
@@ -63,6 +61,16 @@ cleanup_resources() {
     log::info "--- Finished processing resource type: \"$resource_type\" ---"
 }
 
+# verify_namespace checks if the specified namespace exists
+verify_namespace() {
+    local namespace="$1"
+
+    if ! kubectl get namespace "$namespace" &>/dev/null; then
+        log::error "Namespace '$namespace' does not exist"
+        exit 1
+    fi
+}
+
 # Main function to orchestrate the cleanup process.
 main() {
     if [[ "$1" == "-h" || "$1" == "--help" || -z "$1" ]]; then
@@ -71,12 +79,12 @@ main() {
     local namespace="$1"
 
     log::info "Starting ArgoCD CR cleanup in namespace: '$namespace'"
-    log::warn "This will forcefully remove finalizers and delete ALL Applications, ApplicationSets, and AppProjects."
-    log::warn "You have 5 seconds to abort (Ctrl+C)..."
-    sleep 5
+
+    # Verify namespace exists
+    verify_namespace "$namespace"
 
     # Define the ArgoCD resource types to be processed.
-    local -r resource_types=("applications" "applicationsets" "appprojects")
+    local -r resource_types=("applications.argoproj.io" "applicationsets.argoproj.io" "appprojects.argoproj.io")
 
     local rt
     for rt in "${resource_types[@]}"; do
