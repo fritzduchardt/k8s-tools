@@ -1,4 +1,15 @@
 #!/usr/bin/env bash
+#
+# Library: utils.sh
+#
+# Description:
+#   Provides common utility and helper functions for Kubernetes interactions,
+#   user prompts, and command execution.
+#   This script is intended to be sourced by other scripts, not executed directly.
+#
+# Environment Variables:
+#   KUBECTL_BIN: Path to the kubectl binary. Defaults to "kubectl".
+#
 
 KUBECTL_BIN="${KUBECTL_BIN:-kubectl}"
 
@@ -69,3 +80,4 @@ k8s::registry_url_from_secret() {
   local ns="$2"
   lib::exec "$KUBECTL_BIN" get secret "$secret_name" -n "$ns" -o go-template='{{ index .data ".dockerconfigjson" | base64decode }}' | jq -re '.auths | keys[0]'
 }
+
