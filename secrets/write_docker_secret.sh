@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 set -eo pipefail
 
-
-source "../lib/log.sh"
-source "../lib/utils.sh"
+SCRIPT_DIR="$(dirname -- "$0")"
+source "$SCRIPT_DIR/../lib/log.sh"
+source "$SCRIPT_DIR/../lib/utils.sh"
 
 usage() {
   cat >&2 <<EOF
