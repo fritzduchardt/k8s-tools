@@ -11,11 +11,6 @@ function usage() {
     exit 1
 }
 
-if ! command -v kubectl >/dev/null 2>&1; then
-    log::error "kubectl is required but not installed"
-    exit 1
-fi
-
 if [[ "$#" -lt 1 ]]; then
     usage
 fi
@@ -36,9 +31,15 @@ if [[ "$#" -eq 0 ]]; then
     usage
 fi
 
-while IFS= read -r namespace; do
+log::info "Using ns prefix: $ns_prefix"
+
+while IFS= read -u 3 -r namespace; do
   namespace="${namespace#*/}"
   log::info "Switching to namespace: $namespace"
   kubectl config set-context --current --namespace="$namespace"
-  "$@"
-done < <(kubectl get ns -oname | grep -o "^namespace/$ns_prefix.*")
+  if lib::exec "$@"; then
+    log::info "Executed successfully"
+  else
+    log::error "Failed to execute"
+  fi
+done 3< <(lib::exec kubectl get ns -oname | lib::exec grep -o "^namespace/$ns_prefix.*")
