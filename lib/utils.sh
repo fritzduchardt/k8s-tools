@@ -48,6 +48,10 @@ k8s::select_namespace() {
   lib::exec "$KUBECTL_BIN" get ns -oname | sed "s#namespace/##" | fzf --header "Select namespace" --query "$current_namespace"
 }
 
+k8s::get_all_namespaces() {
+  lib::exec "$KUBECTL_BIN" get ns -oname | sed "s#namespace/##"
+}
+
 k8s::current_namespace() {
   if ! lib::exec "$KUBECTL_BIN" cluster-info &>/dev/null; then
     log::error "Failed to retrieve current namespace"
@@ -80,4 +84,3 @@ k8s::registry_url_from_secret() {
   local ns="$2"
   lib::exec "$KUBECTL_BIN" get secret "$secret_name" -n "$ns" -o go-template='{{ index .data ".dockerconfigjson" | base64decode }}' | jq -re '.auths | keys[0]'
 }
-

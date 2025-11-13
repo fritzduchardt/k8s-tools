@@ -8,7 +8,8 @@ lib::exec_k8s_tool() {
 }
 
 # namespace
-alias {clean-namespace,cn}="lib::exec_k8s_tool \"$script_dir/clean-namespace\" clean_namespace.sh"
+alias {clean-namespace,cn}="lib::exec_k8s_tool \"$script_dir/namespace\" clean_namespace.sh"
+alias kns="lib::exec_k8s_tool \"$script_dir/namespace\" kns.sh"
 
 # ports
 alias {port-forward,pf}="lib::exec_k8s_tool \"$script_dir/port-forward\" launch_port_forward.sh"

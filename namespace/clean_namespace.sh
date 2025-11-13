@@ -19,7 +19,6 @@ Usage:
         -h, --help                  Show this help message
         -D, --debug                 Enable debug logging
         -T, --trace                 Enable trace logging
-        -d, --dry-run               Execute in dry-run. Just show commands, don't execute them.
 """
 }
 
@@ -60,10 +59,6 @@ main() {
             ;;
         --trace | -T)
             LOG_LEVEL=trace
-            shift 1
-            ;;
-        --dry-run | -d)
-            DRY_RUN=true
             shift 1
             ;;
         *)
